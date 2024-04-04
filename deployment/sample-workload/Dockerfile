@@ -3,11 +3,9 @@
 
 FROM golang:1.21.6-bullseye AS builder
 
-ARG VERSION
 WORKDIR /app
 
-RUN git clone -b main https://github.com/intel/trustauthority-samples.git trustauthority-samples
-
+RUN git clone -b task/dockerfile-deployment https://github.com/arvind5/trustauthority-samples.git trustauthority-samples
 RUN cd trustauthority-samples && GITCOMMIT=$(git describe --always); \
         VERSION=${VERSION:-v0.0.0}; \
         BUILDDATE=$(TZ=UTC date +%Y-%m-%dT%H:%M:%S%z); \
@@ -21,6 +19,10 @@ RUN cd /app/trustauthority-samples/encryptor && go build encrypt.go
 FROM ubuntu:22.04 AS final
 
 RUN apt update && apt install -y --no-install-recommends openssl jq curl gnupg wget
+
+# Install ca-certificates package to get the system certificates
+RUN apt update && apt install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 ARG PLATFORM
 WORKDIR /app
@@ -36,8 +38,8 @@ COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/encry
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/entrypoint.sh .
 COPY --from=builder /app/trustauthority-samples/encryptor/diabetes-linreg.model .
 
-# Download tdx-cli
-RUN curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-${PLATFORM}.sh | bash -
+# Install tdx-cli
+RUN apt update && curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-${PLATFORM}.sh | bash -
 
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
