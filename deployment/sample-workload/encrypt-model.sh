@@ -90,9 +90,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Generate a sample model
-echo "0.055633 0.154901 0.0167112 0.0281701 0.0399299 0.075899 0.0519244 0.0549757 0.189926" > diabetes-linreg.model
-
 echo "$wrapped_key" > wrappedKey
 
 # Encrypt the datafile using encryptor

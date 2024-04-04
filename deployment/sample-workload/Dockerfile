@@ -33,8 +33,8 @@ COPY --from=builder /app/trustauthority-samples/tdx-ml-workload/trustauthority-d
 COPY --from=builder /app/trustauthority-samples/encryptor/encrypt /usr/local/bin/
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/encrypt-model.sh .
 COPY --from=builder /app/trustauthority-samples/deployment/sample-workload/entrypoint.sh .
+COPY --from=builder /app/trustauthority-samples/encryptor/diabetes-linreg.model .
 
-ENV CLI_VERSION=v1.2.0
 # Download tdx-cli
 RUN curl -L https://raw.githubusercontent.com/intel/trustauthority-client-for-go/main/release/install-tdx-cli-dcap.sh |  bash -
 
